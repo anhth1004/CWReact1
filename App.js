@@ -1,20 +1,40 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { NavigationContainer } from "@react-navigation/native";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { createStackNavigator } from "@react-navigation/stack";
+import React, { useEffect } from "react";
 
-export default function App() {
+import Database from "./Database";
+import DetailScreen from "./Screens/DetailScreen";
+import EditScreen from "./Screens/EditScreen";
+import EntryScreen from "./Screens/EntryScreen"; 
+import HomeScreen from "./Screens/HomeScreen";
+import SearchScreen from "./Screens/SearchScreen";
+
+const Stack = createStackNavigator();
+const Tab = createBottomTabNavigator();
+
+const HomeStack = () => {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <Stack.Navigator>
+      <Stack.Screen name="Home" component={HomeScreen} />
+      <Stack.Screen name="Entry" component={EntryScreen} />
+      <Stack.Screen name="Detail" component={DetailScreen} /> 
+      <Stack.Screen name="Edit" component={EditScreen} />
+    </Stack.Navigator>
+  )
+}
+const App = () => {
+  useEffect(() => {
+    Database.initDatabase();
+  }, []);
+  return (
+    <NavigationContainer>
+      <Tab.Navigator>
+        <Tab.Screen name="Trang chủ" component={HomeStack} />
+        <Tab.Screen name="Thêm" component={EntryScreen} />
+        <Tab.Screen name="Tìm kiếm" component={SearchScreen} />
+      </Tab.Navigator>
+    </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default App;

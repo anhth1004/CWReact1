@@ -57,10 +57,21 @@ const initDatabase = () => {
       },
       (error) => console.error("Error occurred while creating the table.", error)
     );
+
+    tx.executeSql(
+      `CREATE TABLE IF NOT EXISTS observations (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        hikeId INTEGER,
+        observation TEXT,
+        dateObservation TEXT,
+        comment TEXT
+      );`,
+      [],
+      () => console.log("Created observations table"),
+      (error) => console.error("Error occurred while creating the observations table.", error)
+    );
   });
 };
-
-// CRUD functions have been updated to include the new fields.
 
 const addTodo = (title, location, date, parkingAvailable, lengthOfTheHike, difficultyLevel, description) => {
   return new Promise((resolve, reject) => {
@@ -79,44 +90,6 @@ const addTodo = (title, location, date, parkingAvailable, lengthOfTheHike, diffi
   });
 };
 
-const updateTodo = (id, updatedTodo) => {
-  return new Promise((resolve, reject) => {
-    db.transaction((tx) => {
-      tx.executeSql(
-        "UPDATE todos SET title = ?, location = ?, date = ?, parkingAvailable = ?, lengthOfTheHike = ?, difficultyLevel = ?, description = ? WHERE id = ?",
-        [updatedTodo.title, updatedTodo.location, updatedTodo.date, updatedTodo.parkingAvailable, updatedTodo.lengthOfTheHike, updatedTodo.difficultyLevel,, updatedTodo.description, id],
-        () => {
-          resolve();
-        },
-        (_, error) => {
-          reject(error);
-        }
-      );
-    });
-  });
-};
-const searchTodos = (searchText) => {
-  return new Promise((resolve, reject) => {
-    db.transaction((tx) => {
-      tx.executeSql(
-        "SELECT * FROM todos WHERE title LIKE ?",
-        [`%${searchText}%`], // This will search for todos with titles containing the searchText
-        (_, { rows }) => {
-          const data = [];
-          for (let i = 0; i < rows.length; i++) {
-            data.push(rows.item(i));
-          }
-          resolve(data);
-        },
-        (_, error) => {
-          reject(error);
-        }
-      );
-    });
-  });
-};
-
-
 const getTodos = () => {
   return new Promise((resolve, reject) => {
     db.transaction((tx) => {
@@ -124,11 +97,11 @@ const getTodos = () => {
         "SELECT * FROM todos",
         [],
         (_, { rows }) => {
-          const todos = rows._array.map((todo) => ({
-            ...todo,
-            date: todo.date, // Preserve the date format
-          }));
-          resolve(todos);
+          const data = [];
+          for (let i = 0; i < rows.length; i++) {
+            data.push(rows.item(i));
+          }
+          resolve(data);
         },
         (_, error) => {
           reject(error);
@@ -155,13 +128,143 @@ const deleteTodo = (id) => {
   });
 };
 
-const Database = {
+const updateTodo = (id, updatedTodo) => {
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "UPDATE todos SET title = ?, location = ?, date = ?, parkingAvailable = ?, lengthOfTheHike = ?, difficultyLevel = ?, description = ? WHERE id = ?",
+        [updatedTodo.title, updatedTodo.location, updatedTodo.date, updatedTodo.parkingAvailable, updatedTodo.lengthOfTheHike, updatedTodo.difficultyLevel, updatedTodo.description, id],
+        () => {
+          resolve();
+        },
+        (_, error) => {
+          reject(error);
+        }
+      );
+    });
+  });
+};
+
+const searchTodos = (searchText) => {
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "SELECT * FROM todos WHERE title LIKE ?",
+        [`%${searchText}%`], // This will search for todos with titles containing the searchText
+        (_, { rows }) => {
+          const data = [];
+          for (let i = 0; i < rows.length; i++) {
+            data.push(rows.item(i));
+          }
+          resolve(data);
+        },
+        (_, error) => {
+          reject(error);
+        }
+      );
+    });
+  });
+};
+
+const addObservation = (hikeId, observation, dateObservation, comment) => {
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "INSERT INTO observations (hikeId, observation, dateObservation, comment) VALUES (?, ?, ?, ?)",
+        [hikeId, observation, dateObservation, comment],
+        (_, { insertId }) => {
+          resolve(insertId);
+        },
+        (_, error) => {
+          reject(error);
+        }
+      );
+    });
+  });
+};
+
+const editObservation = (id, updatedObservation) => {
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "UPDATE observations SET observation = ?, dateObservation = ?, comment = ? WHERE id = ?",
+        [updatedObservation.observation, updatedObservation.dateObservation, updatedObservation.comment, id],
+        () => {
+          resolve();
+        },
+        (_, error) => {
+          reject(error);
+        }
+      );
+    });
+  });
+};
+
+const deleteObservation = (id) => {
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "DELETE FROM observations WHERE id = ?",
+        [id],
+        () => {
+          resolve();
+        },
+        (_, error) => {
+          reject(error);
+        }
+      );
+    });
+  });
+};
+const getObservationsForHike = (hikeId) => {
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "SELECT * FROM observations WHERE hikeId = ?",
+        [hikeId],
+        (_, { rows }) => {
+          const observations = rows._array;
+          resolve(observations);
+        },
+        (_, error) => {
+          reject(error);
+        }
+      );
+    });
+  });
+};
+const getObservation = (observationId) => {
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "SELECT * FROM observations WHERE id = ?",
+        [observationId],
+        (_, { rows }) => {
+          if (rows.length > 0) {
+            resolve(rows.item(0));
+          } else {
+            resolve(null);
+          }
+        },
+        (_, error) => {
+          reject(error);
+        }
+      );
+    });
+  });
+};
+
+
+export default {
   initDatabase,
   addTodo,
   getTodos,
   deleteTodo,
   updateTodo,
   searchTodos,
+  addObservation,
+  editObservation,
+  deleteObservation,
+  getObservationsForHike,
+  getObservation,
 };
-
-export default Database;

@@ -1,8 +1,8 @@
 import React from "react";
-import { ScrollView, StyleSheet } from "react-native";
+import { ScrollView, StyleSheet, Button, TouchableOpacity,  Text  } from "react-native";
 import { Card, Title, Paragraph } from "react-native-paper";
 
-const DetailScreen = ({ route }) => {
+const DetailScreen = ({ route, navigation }) => {
   const { todo } = route.params;
 
   if (!todo) {
@@ -39,7 +39,11 @@ const DetailScreen = ({ route }) => {
   } else {
     console.log("Invalid date");
     formattedDate = "Invalid Date";
-  }
+  };
+
+  const handleViewObservation = () => {
+    navigation.navigate("ViewObservationScreen", { hikeId: todo.id });
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -91,6 +95,10 @@ const DetailScreen = ({ route }) => {
           <Paragraph>{todo.difficultyLevel}</Paragraph>
         </Card.Content>
       </Card>
+
+      <TouchableOpacity style={styles.button} onPress={handleViewObservation}>
+        <Text style={styles.buttonText}>View Observations</Text>
+      </TouchableOpacity>
     </ScrollView>
   );
 };
@@ -102,6 +110,17 @@ const styles = StyleSheet.create({
   },
   card: {
     marginVertical: 8,
+  },
+  button: {
+    backgroundColor: '#2196F3',
+    padding: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 16,
+  },
+  buttonText: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
 });
 

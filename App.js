@@ -5,10 +5,12 @@ import React, { useEffect } from "react";
 
 import Database from "./Database";
 import DetailScreen from "./Screens/DetailScreen";
-import EditScreen from "./Screens/EditScreen";
+import EditObservationScreen from "./Screens/EditObservation";
 import EntryScreen from "./Screens/EntryScreen"; 
 import HomeScreen from "./Screens/HomeScreen";
 import SearchScreen from "./Screens/SearchScreen";
+import ViewObservationScreen from "./Screens/ViewObservationScreen";
+import AddObservationScreen from "./Screens/AddObservationScreen";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -19,7 +21,9 @@ const HomeStack = () => {
       <Stack.Screen name="Home" component={HomeScreen} />
       <Stack.Screen name="Entry" component={EntryScreen} />
       <Stack.Screen name="Detail" component={DetailScreen} /> 
-      <Stack.Screen name="Edit" component={EditScreen} />
+      <Stack.Screen name="EditObservation" component={EditObservationScreen} />
+      <Stack.Screen name="ViewObservationScreen" component={ViewObservationScreen} />
+      <Stack.Screen name="AddObservation" component={AddObservationScreen} />
     </Stack.Navigator>
   )
 }
